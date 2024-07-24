@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'https://unpkg.com/three@0.138.3/examples/jsm/controls/OrbitControls.js';
 
-$(document).ready(function() {
+$(document).ready(function () {
     const container = $('#cube-container')[0];
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -69,13 +69,13 @@ $(document).ready(function() {
 
     animate();
 
-    $(window).resize(function() {
+    $(window).resize(function () {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    $('#spread-button').click(function() {
+    $('#spread-button').click(function () {
         cubes.forEach(cube => {
             new TWEEN.Tween(cube.position)
                 .to({
@@ -90,7 +90,7 @@ $(document).ready(function() {
         $('#combine-button').show();
     });
 
-    $('#combine-button').click(function() {
+    $('#combine-button').click(function () {
         cubes.forEach(cube => {
             new TWEEN.Tween(cube.position)
                 .to({
@@ -111,4 +111,78 @@ $(document).ready(function() {
     }
 
     update();
+
+    let expandedCubes = {
+        threeColored: false,
+        twoColored: false,
+        oneColored: false
+    };
+
+    function toggleCubes(cubeType) {
+        const cubeTypes = {
+            threeColored: hasThreeColoredFaces,
+            twoColored: hasTwoColoredFaces,
+            oneColored: hasOneColoredFace
+        };
+
+        cubes.forEach(cube => {
+            if (cubeTypes[cubeType](cube)) {
+                const targetPosition = expandedCubes[cubeType]
+                    ? cube.userData.originalPosition
+                    : {
+                        x: cube.userData.originalPosition.x * 2,
+                        y: cube.userData.originalPosition.y * 2,
+                        z: cube.userData.originalPosition.z * 2
+                    };
+
+                new TWEEN.Tween(cube.position)
+                    .to(targetPosition, 1000)
+                    .easing(TWEEN.Easing.Quadratic.Out)
+                    .start();
+            }
+        });
+
+        expandedCubes[cubeType] = !expandedCubes[cubeType];
+        updateButtonText();
+    }
+
+    function updateButtonText() {
+        $('#expand-colored-cubes-button').text(expandedCubes.threeColored ? 'Thu gọn các khối 3 mặt có màu' : 'Mở rộng các khối 3 mặt có màu');
+        $('#expand-two-colored-cubes-button').text(expandedCubes.twoColored ? 'Thu gọn các khối 2 mặt có màu' : 'Mở rộng các khối 2 mặt có màu');
+        $('#expand-one-colored-cubes-button').text(expandedCubes.oneColored ? 'Thu gọn các khối 1 mặt có màu' : 'Mở rộng các khối 1 mặt có màu');
+    }
+
+    function hasThreeColoredFaces(cube) {
+        const faceColors = cube.material.map(material => material.color.getHex());
+        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 3;
+    }
+
+    function hasTwoColoredFaces(cube) {
+        const faceColors = cube.material.map(material => material.color.getHex());
+        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 2;
+    }
+
+    function hasOneColoredFace(cube) {
+        const faceColors = cube.material.map(material => material.color.getHex());
+        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 1;
+    }
+
+    $('#expand-colored-cubes-button').click(function() {
+        toggleCubes('threeColored');
+        if(expandedCubes.twoColored) toggleCubes('twoColored');
+        if(expandedCubes.oneColored) toggleCubes('oneColored');
+    });
+
+    $('#expand-two-colored-cubes-button').click(function() {
+        toggleCubes('twoColored');
+        if(expandedCubes.threeColored) toggleCubes('threeColored');
+        if(expandedCubes.oneColored) toggleCubes('oneColored');
+    });
+
+    $('#expand-one-colored-cubes-button').click(function() {
+        toggleCubes('oneColored');
+        if(expandedCubes.twoColored) toggleCubes('twoColored');
+        if(expandedCubes.threeColored) toggleCubes('oneColored');
+    });
+
 });
