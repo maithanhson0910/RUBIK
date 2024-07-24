@@ -16,9 +16,9 @@ $(document).ready(function() {
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
 
-    const cubeSize = 1;
-    const offset = cubeSize * 1.1; // Slightly larger to avoid z-fighting
-    const spreadOffset = cubeSize * 2; // Larger offset for spreading cubes
+    const cubeSize = 0.5; // Giảm kích thước khối
+    const offset = cubeSize * 1.1; // Cập nhật kích thước khối
+    const spreadOffset = cubeSize * 2; // Cập nhật kích thước khối
 
     // Colors for outer faces
     const faceMaterials = [
