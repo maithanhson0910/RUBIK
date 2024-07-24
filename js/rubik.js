@@ -16,18 +16,45 @@ $(document).ready(function() {
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
 
-    // Create the Rubik's Cube
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const materials = [
+    const cubeSize = 1;
+    const offset = cubeSize * 1.1; // Slightly larger to avoid z-fighting
+    const spreadOffset = cubeSize * 2; // Larger offset for spreading cubes
+
+    // Colors for outer faces
+    const faceMaterials = [
         new THREE.MeshBasicMaterial({ color: 0xff0000 }), // Red
         new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // Green
         new THREE.MeshBasicMaterial({ color: 0x0000ff }), // Blue
         new THREE.MeshBasicMaterial({ color: 0xffff00 }), // Yellow
         new THREE.MeshBasicMaterial({ color: 0xffa500 }), // Orange
         new THREE.MeshBasicMaterial({ color: 0xffffff }), // White
+        new THREE.MeshBasicMaterial({ color: 0x000000 }), // Black for inner faces
     ];
-    const cube = new THREE.Mesh(geometry, materials);
-    scene.add(cube);
+
+    const cubes = [];
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            for (let z = -1; z <= 1; z++) {
+                const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+
+                // Determine the material for each face
+                const materials = [
+                    (x === 1 ? faceMaterials[0] : faceMaterials[6]), // +X (Red or Black)
+                    (x === -1 ? faceMaterials[1] : faceMaterials[6]), // -X (Green or Black)
+                    (y === 1 ? faceMaterials[2] : faceMaterials[6]), // +Y (Blue or Black)
+                    (y === -1 ? faceMaterials[3] : faceMaterials[6]), // -Y (Yellow or Black)
+                    (z === 1 ? faceMaterials[4] : faceMaterials[6]), // +Z (Orange or Black)
+                    (z === -1 ? faceMaterials[5] : faceMaterials[6]), // -Z (White or Black)
+                ];
+
+                const cube = new THREE.Mesh(geometry, materials);
+                cube.userData.originalPosition = { x: x * offset, y: y * offset, z: z * offset };
+                cube.position.set(cube.userData.originalPosition.x, cube.userData.originalPosition.y, cube.userData.originalPosition.z);
+                scene.add(cube);
+                cubes.push(cube);
+            }
+        }
+    }
 
     camera.position.z = 5;
 
@@ -47,5 +74,31 @@ $(document).ready(function() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Spread cubes when "Spread Cubes" button is clicked
+    $('#spread-button').click(function() {
+        cubes.forEach(cube => {
+            cube.position.set(
+                cube.userData.originalPosition.x * 2, 
+                cube.userData.originalPosition.y * 2, 
+                cube.userData.originalPosition.z * 2
+            );
+        });
+        $('#spread-button').hide();
+        $('#combine-button').show();
+    });
+
+    // Combine cubes when "Combine Cubes" button is clicked
+    $('#combine-button').click(function() {
+        cubes.forEach(cube => {
+            cube.position.set(
+                cube.userData.originalPosition.x, 
+                cube.userData.originalPosition.y, 
+                cube.userData.originalPosition.z
+            );
+        });
+        $('#combine-button').hide();
+        $('#spread-button').show();
     });
 });
