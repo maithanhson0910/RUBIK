@@ -27,13 +27,13 @@ $(document).ready(function () {
     scene.add(directionalLight);
 
     const faceMaterials = [
-        new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-        new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-        new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-        new THREE.MeshBasicMaterial({ color: 0xffff00 }),
-        new THREE.MeshBasicMaterial({ color: 0xffa500 }),
-        new THREE.MeshBasicMaterial({ color: 0xffffff }),
-        new THREE.MeshBasicMaterial({ color: 0x000000 }),
+        new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Red face, opaque and visible from both sides
+        new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Green face, opaque and visible from both sides
+        new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Blue face, opaque and visible from both sides
+        new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Yellow face, opaque and visible from both sides
+        new THREE.MeshBasicMaterial({ color: 0xffa500, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Orange face, opaque and visible from both sides
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1, side: THREE.DoubleSide }), // White face, opaque and visible from both sides
+        new THREE.MeshBasicMaterial({ color: 0x808080, transparent: true, opacity: 0 })  // Gray face, for the internal faces, more transparent
     ];
 
     const cubes = [];
@@ -88,6 +88,9 @@ $(document).ready(function () {
         });
         $('#spread-button').hide();
         $('#combine-button').show();
+        if (expandedCubes.threeColored) toggleCubes('threeColored');
+        else if (expandedCubes.twoColored) toggleCubes('twoColored');
+        else if (expandedCubes.oneColored) toggleCubes('oneColored');
     });
 
     $('#combine-button').click(function () {
@@ -103,6 +106,9 @@ $(document).ready(function () {
         });
         $('#combine-button').hide();
         $('#spread-button').show();
+        if (expandedCubes.threeColored) toggleCubes('threeColored');
+        else if (expandedCubes.twoColored) toggleCubes('twoColored');
+        else if (expandedCubes.oneColored) toggleCubes('oneColored');
     });
 
     function update() {
@@ -117,6 +123,27 @@ $(document).ready(function () {
         twoColored: false,
         oneColored: false
     };
+
+    function updateButtonText() {
+        $('#expand-colored-cubes-button').text(expandedCubes.threeColored ? 'Thu gọn các khối 3 mặt có màu' : 'Mở rộng các khối 3 mặt có màu');
+        $('#expand-two-colored-cubes-button').text(expandedCubes.twoColored ? 'Thu gọn các khối 2 mặt có màu' : 'Mở rộng các khối 2 mặt có màu');
+        $('#expand-one-colored-cubes-button').text(expandedCubes.oneColored ? 'Thu gọn các khối 1 mặt có màu' : 'Mở rộng các khối 1 mặt có màu');
+    }
+
+    function hasThreeColoredFaces(cube) {
+        const faceColors = cube.material.map(material => material.color.getHex());
+        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 3;
+    }
+
+    function hasTwoColoredFaces(cube) {
+        const faceColors = cube.material.map(material => material.color.getHex());
+        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 2;
+    }
+
+    function hasOneColoredFace(cube) {
+        const faceColors = cube.material.map(material => material.color.getHex());
+        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 1;
+    }
 
     function toggleCubes(cubeType) {
         const cubeTypes = {
@@ -144,45 +171,34 @@ $(document).ready(function () {
 
         expandedCubes[cubeType] = !expandedCubes[cubeType];
         updateButtonText();
+        updateExpandButton();
     }
 
-    function updateButtonText() {
-        $('#expand-colored-cubes-button').text(expandedCubes.threeColored ? 'Thu gọn các khối 3 mặt có màu' : 'Mở rộng các khối 3 mặt có màu');
-        $('#expand-two-colored-cubes-button').text(expandedCubes.twoColored ? 'Thu gọn các khối 2 mặt có màu' : 'Mở rộng các khối 2 mặt có màu');
-        $('#expand-one-colored-cubes-button').text(expandedCubes.oneColored ? 'Thu gọn các khối 1 mặt có màu' : 'Mở rộng các khối 1 mặt có màu');
+    function updateExpandButton() {
+        const anyExpanded = expandedCubes.threeColored || expandedCubes.twoColored || expandedCubes.oneColored;
+        if (anyExpanded) {
+            $('#spread-button').hide();
+            $('#combine-button').show();
+        }
+            
     }
 
-    function hasThreeColoredFaces(cube) {
-        const faceColors = cube.material.map(material => material.color.getHex());
-        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 3;
-    }
-
-    function hasTwoColoredFaces(cube) {
-        const faceColors = cube.material.map(material => material.color.getHex());
-        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 2;
-    }
-
-    function hasOneColoredFace(cube) {
-        const faceColors = cube.material.map(material => material.color.getHex());
-        return faceColors.filter(color => color !== faceMaterials[6].color.getHex()).length === 1;
-    }
-
-    $('#expand-colored-cubes-button').click(function() {
+    $('#expand-colored-cubes-button').click(function () {
         toggleCubes('threeColored');
-        if(expandedCubes.twoColored) toggleCubes('twoColored');
-        if(expandedCubes.oneColored) toggleCubes('oneColored');
+        if (expandedCubes.twoColored) toggleCubes('twoColored');
+        if (expandedCubes.oneColored) toggleCubes('oneColored');
     });
 
-    $('#expand-two-colored-cubes-button').click(function() {
+    $('#expand-two-colored-cubes-button').click(function () {
         toggleCubes('twoColored');
-        if(expandedCubes.threeColored) toggleCubes('threeColored');
-        if(expandedCubes.oneColored) toggleCubes('oneColored');
+        if (expandedCubes.threeColored) toggleCubes('threeColored');
+        if (expandedCubes.oneColored) toggleCubes('oneColored');
     });
 
-    $('#expand-one-colored-cubes-button').click(function() {
+    $('#expand-one-colored-cubes-button').click(function () {
         toggleCubes('oneColored');
-        if(expandedCubes.twoColored) toggleCubes('twoColored');
-        if(expandedCubes.threeColored) toggleCubes('oneColored');
+        if (expandedCubes.twoColored) toggleCubes('twoColored');
+        if (expandedCubes.threeColored) toggleCubes('threeColored');
     });
 
 });
