@@ -33,7 +33,7 @@ $(document).ready(function () {
         new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Yellow face, opaque and visible from both sides
         new THREE.MeshBasicMaterial({ color: 0xffa500, transparent: true, opacity: 1, side: THREE.DoubleSide }), // Orange face, opaque and visible from both sides
         new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1, side: THREE.DoubleSide }), // White face, opaque and visible from both sides
-        new THREE.MeshBasicMaterial({ color: 0x808080, transparent: true, opacity: 0 })  // Gray face, for the internal faces, more transparent
+        new THREE.MeshBasicMaterial({ color: 0x808080, transparent: true, opacity: 0.3 })  // Gray face, for the internal faces, more transparent
     ];
 
     const cubes = [];
@@ -157,9 +157,9 @@ $(document).ready(function () {
                 const targetPosition = expandedCubes[cubeType]
                     ? cube.userData.originalPosition
                     : {
-                        x: cube.userData.originalPosition.x * 2,
-                        y: cube.userData.originalPosition.y * 2,
-                        z: cube.userData.originalPosition.z * 2
+                        x: cube.userData.originalPosition.x * 3,
+                        y: cube.userData.originalPosition.y * 3,
+                        z: cube.userData.originalPosition.z * 3     
                     };
 
                 new TWEEN.Tween(cube.position)
