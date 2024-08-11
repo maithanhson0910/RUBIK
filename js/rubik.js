@@ -76,6 +76,10 @@ $(document).ready(function () {
     });
 
     $('#spread-button').click(function () {
+        spreadButtonClick();
+    });
+
+    function spreadButtonClick() {
         cubes.forEach(cube => {
             new TWEEN.Tween(cube.position)
                 .to({
@@ -91,9 +95,13 @@ $(document).ready(function () {
         if (expandedCubes.threeColored) toggleCubes('threeColored');
         else if (expandedCubes.twoColored) toggleCubes('twoColored');
         else if (expandedCubes.oneColored) toggleCubes('oneColored');
-    });
+    }
 
     $('#combine-button').click(function () {
+        combineButtonClick();
+    });
+
+    function combineButtonClick() {
         cubes.forEach(cube => {
             new TWEEN.Tween(cube.position)
                 .to({
@@ -109,7 +117,7 @@ $(document).ready(function () {
         if (expandedCubes.threeColored) toggleCubes('threeColored');
         else if (expandedCubes.twoColored) toggleCubes('twoColored');
         else if (expandedCubes.oneColored) toggleCubes('oneColored');
-    });
+    }
 
     function update() {
         TWEEN.update();
@@ -159,7 +167,7 @@ $(document).ready(function () {
                     : {
                         x: cube.userData.originalPosition.x * 3,
                         y: cube.userData.originalPosition.y * 3,
-                        z: cube.userData.originalPosition.z * 3     
+                        z: cube.userData.originalPosition.z * 3
                     };
 
                 new TWEEN.Tween(cube.position)
@@ -180,22 +188,25 @@ $(document).ready(function () {
             $('#spread-button').hide();
             $('#combine-button').show();
         }
-            
+
     }
 
     $('#expand-colored-cubes-button').click(function () {
+        combineButtonClick();
         toggleCubes('threeColored');
         if (expandedCubes.twoColored) toggleCubes('twoColored');
         if (expandedCubes.oneColored) toggleCubes('oneColored');
     });
 
     $('#expand-two-colored-cubes-button').click(function () {
+        combineButtonClick();
         toggleCubes('twoColored');
         if (expandedCubes.threeColored) toggleCubes('threeColored');
         if (expandedCubes.oneColored) toggleCubes('oneColored');
     });
 
     $('#expand-one-colored-cubes-button').click(function () {
+        combineButtonClick();
         toggleCubes('oneColored');
         if (expandedCubes.twoColored) toggleCubes('twoColored');
         if (expandedCubes.threeColored) toggleCubes('threeColored');
